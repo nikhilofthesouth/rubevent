@@ -5,6 +5,7 @@ Feature: listen to event loop
   So that I can react to those events
 
   Scenario: listen for "food" events
-    Given a "food" event I want to listen for
+    Given an event loop
+    And a listener for a "food" event
     When I add an event listener for that event
     Then the event loop registers a listener for a "food" event

@@ -16,14 +16,20 @@ module Rubevent
       @events.push event
     end
 
-    def listen_for event
+    def listen event_type
       raise EventListenError unless @active
-      @listeners[event.intern] = []
+      listener = Proc.new { yield }
+      @listeners[event_type] = [listener]
     end
     
     def start
       @active = true
       self
+    end
+
+    def run
+      event = @events.shift
+      @listeners[event].each { |listener| listener.call }
     end
   end
 end
