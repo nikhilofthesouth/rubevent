@@ -21,7 +21,7 @@ module Rubevent
 
       it "should decline listen attempts with an error" do
         expect {
-          event_loop.listen_for "event"
+          event_loop.listen "event"
         }.to raise_error(EventListenError)
         expect(event_loop.listeners).to be_empty
       end
@@ -36,8 +36,8 @@ module Rubevent
       end
 
       it "should accept event listeners" do
-        event_loop.listen_for "event"
-        expect(event_loop.listeners).to include("event".to_sym)
+        event_loop.listen "event"
+        expect(event_loop.listeners).to include("event")
       end
     end
   end
