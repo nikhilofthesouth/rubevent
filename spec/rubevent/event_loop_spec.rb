@@ -47,8 +47,3 @@ module Rubevent
     end
   end
 end
-
-def let_event_loop_process
-  Thread.pass
-  sleep 0.1
-end
