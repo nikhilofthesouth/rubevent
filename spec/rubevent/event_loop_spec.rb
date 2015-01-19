@@ -4,7 +4,11 @@ module Rubevent
       let(:event_loop) { EventLoop.new }
 
       it "has no events to process" do
-        expect(event_loop.events).to be_empty
+        expect(event_loop.metrics.loop_size).to be 0
+      end
+
+      it "has no listeners registered" do
+        expect(event_loop.metrics.num_listeners).to be 0
       end
     end
 
@@ -12,13 +16,13 @@ module Rubevent
       let(:event_loop) {
         event_loop = EventLoop.new
         event_loop.stop
-        Thread.pass
-        sleep 0.1
         event_loop
       }
 
       it "should not automatically process events" do
-        expect(event_loop.loop.status).to eq("sleep")
+        event_loop.publish "event"
+        let_event_loop_process
+        expect(event_loop.metrics.loop_size).to be 1
       end
     end
 
@@ -27,19 +31,24 @@ module Rubevent
 
       it "should accept publish events" do
         event_loop.publish "event"
-        expect(event_loop.events.assoc "event").to_not be_nil
+        expect(event_loop.metrics.events_received("event")).to_not be 0
       end
 
       it "should accept event listeners" do
         event_loop.listen("event") { }
-        expect(event_loop.listeners).to include("event")
+        expect(event_loop.metrics.num_listeners("event")).to_not be 0
       end
 
       it "should process events when run" do
         event_loop.publish "event"
         event_loop.run
-        expect(event_loop.events).to be_empty
+        expect(event_loop.metrics.loop_size).to be 0
       end
     end
   end
+end
+
+def let_event_loop_process
+  Thread.pass
+  sleep 0.1
 end

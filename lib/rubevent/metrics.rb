@@ -21,7 +21,7 @@ module Rubevent
     def num_listeners(event_type = nil)
       calc_hash @listeners_registered, event_type
     end
-    
+
     def mark_processed event_type
       update_hash @events_processed, event_type
     end
