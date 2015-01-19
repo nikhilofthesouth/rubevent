@@ -13,6 +13,7 @@ module Rubevent
         event_loop = EventLoop.new
         event_loop.stop
         Thread.pass
+        sleep 0.1
         event_loop
       }
 

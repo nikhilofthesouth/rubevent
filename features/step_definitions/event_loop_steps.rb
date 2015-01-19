@@ -15,6 +15,18 @@ Given /^a listener for a "(.*?)" event$/ do |event_type|
   @listen_type = event_type
 end
 
+Given /^many events$/ do
+  @events = []
+  event_types = ["type1", "type2", "type3"]
+  1000.times { @events << event_types.sample }
+end
+
+Given /^several event listeners$/ do
+  @listeners = []
+  event_types = ["type1", "type2", "type3"]
+  25.times { @listeners << event_types.sample }
+end
+
 When /^I create an event loop$/ do
   @event_loop = Rubevent::EventLoop.new.start
 end
@@ -28,6 +40,19 @@ When /^I add an event listener for that event$/ do
   @event_loop.listen @listen_type do
     @notified = true
   end
+end
+
+When /^I add those event listeners$/ do
+  @listeners.each { |listener| @event_loop.listen(listener) do; end }
+end
+
+When /^I publish those events$/ do
+  @events.each { |event| @event_loop.publish event }
+end
+
+When /^I run the event loop$/ do
+  @event_loop.start
+  @event_loop.run
 end
 
 Then /^I should have a handle to the event loop$/ do
@@ -45,4 +70,8 @@ end
 Then /^the event listener is notified of the "(.*?)" event$/ do |event_type|
   @event_loop.run
   assert @notified
+end
+
+Then /^I can access metrics for my event loop usage$/ do
+  pending # express the regexp above with the code you wish you had
 end
