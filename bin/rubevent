@@ -1,1 +1,23 @@
 #! /usr/bin/env ruby
+
+# Get the current file location parent directory
+require 'pathname'
+basepath = Pathname(__FILE__).realpath.dirname.dirname.to_path
+rubevent_path = basepath + "/lib"
+
+# Add rubevent to LOAD_PATH and require it
+$LOAD_PATH << rubevent_path
+require 'rubevent'
+
+event_loop = Rubevent::EventLoop.new.start
+event_loop.listen("event1") { |details|
+  puts details
+}
+event_loop.publish "event1", { :cool => true, :scale => 10 }
+
+sleep 0.1
+if event_loop.metrics.events_processed != 1
+  puts "ERROR"
+  exit 1
+end
+puts "SUCCESS"

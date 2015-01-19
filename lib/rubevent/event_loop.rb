@@ -12,7 +12,7 @@ module Rubevent
       @events = []
       @listeners = {}
       @loop = Thread.new do
-        while true
+        loop do
           if @events.empty? || @halted
             Thread.stop
           else
