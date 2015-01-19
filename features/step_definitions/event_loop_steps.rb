@@ -2,7 +2,8 @@ Given /^no access to an event loop$/ do
 end
 
 Given /^an event loop$/ do
-  @event_loop = Rubevent::EventLoop.new.start
+  @event_loop = Rubevent::EventLoop.new
+  @event_loop.stop
 end
 
 Given /^a "(.*?)" event$/ do |event_type|
@@ -30,7 +31,7 @@ When /^I add an event listener for that event$/ do
 end
 
 Then /^I should have a handle to the event loop$/ do
-  @event_loop.active?
+  @event_loop.stop
 end
 
 Then /^event loop should process a "(.*?)" event$/ do |event_type|

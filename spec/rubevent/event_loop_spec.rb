@@ -3,33 +3,21 @@ module Rubevent
     context "a newly created event loop" do
       let(:event_loop) { EventLoop.new }
 
-      it { is_expected.to_not be_active }
       it "has no events to process" do
         expect(event_loop.events).to be_empty
       end
     end
 
-    context "an inactive event loop" do
-      let(:event_loop) { EventLoop.new }
+    context "a halted event loop" do
+      let(:event_loop) {
+        event_loop = EventLoop.new
+        event_loop.stop
+        Thread.pass
+        event_loop
+      }
 
-      it "should decline publish attempts with an error" do
-        expect {
-          event_loop.publish "event"
-        }.to raise_error(EventPublishError)
-        expect(event_loop.events).to be_empty
-      end
-
-      it "should decline listen attempts with an error" do
-        expect {
-          event_loop.listen "event"
-        }.to raise_error(EventListenError)
-        expect(event_loop.listeners).to be_empty
-      end
-
-      it "should not process events when run" do
-        expect {
-          event_loop.run
-        }.to raise_error(EventLoopError)
+      it "should not automatically process events" do
+        expect(event_loop.loop.status).to eq("sleep")
       end
     end
 
