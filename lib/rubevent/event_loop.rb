@@ -4,6 +4,7 @@ module Rubevent
   class EventPublishError < EventLoopError; end
   class EventListenError < EventLoopError; end
 
+  # TODO: Automatic processing and monitoring
   class EventLoop
     attr_reader :active, :events, :listeners
     alias_method :active?, :active
