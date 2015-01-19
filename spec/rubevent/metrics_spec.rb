@@ -18,14 +18,14 @@ module Rubevent
     end
 
     context "warmed up metrics" do
-      before(:example) {
-        event_loop.listen("event1") { }
-        event_loop.listen("event2") { }
-        4.times { event_loop.publish "event1" }
-        2.times { event_loop.publish "event2" }
-      }
-
       context "tracking a running event loop" do
+        before(:example) {
+          event_loop.listen("event1") { }
+          event_loop.listen("event2") { }
+          4.times { event_loop.publish "event1" }
+          2.times { event_loop.publish "event2" }
+        }
+
         it "should store events processed" do
           sleep 0.1 until metrics.loop_size == 0
           expect(metrics.events_processed).to be 6
@@ -56,6 +56,12 @@ module Rubevent
 
       context "tracking a halted event loop" do
         prepend_before(:example) { event_loop.stop }
+        before(:example) {
+          event_loop.listen("event1") { }
+          event_loop.listen("event2") { }
+          4.times { event_loop.publish "event1" }
+          2.times { event_loop.publish "event2" }
+        }
 
         it "should have a constant loop size" do
           let_event_loop_process

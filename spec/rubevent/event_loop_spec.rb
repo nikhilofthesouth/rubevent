@@ -40,6 +40,20 @@ module Rubevent
         event_loop.run
         expect(event_loop.metrics.loop_size).to be 0
       end
+
+      it "should error if max queue size is reached" do
+        event_loop.max_queue_size = 0
+        expect {
+          event_loop.publish "event"
+        }.to raise_error(EventLoopError)
+      end
+
+      it "should error if max listeners is reached" do
+        event_loop.max_listeners = 0
+        expect {
+          event_loop.listen("event") { }
+        }.to raise_error(EventLoopError)
+      end
     end
   end
 end
