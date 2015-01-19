@@ -4,7 +4,7 @@ module Rubevent
   class EventLoop
     attr_reader :active, :events, :listeners
     alias_method :active?, :active
-    
+
     def initialize
       @active = false
       @events = []
@@ -21,10 +21,14 @@ module Rubevent
       listener = Proc.new { yield }
       @listeners[event_type] = [listener]
     end
-    
+
     def start
       @active = true
       self
+    end
+
+    def stop
+      @active = false
     end
 
     def run
