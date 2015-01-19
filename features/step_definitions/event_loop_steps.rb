@@ -73,5 +73,11 @@ Then /^the event listener is notified of the "(.*?)" event$/ do |event_type|
 end
 
 Then /^I can access metrics for my event loop usage$/ do
-  pending # express the regexp above with the code you wish you had
+  metrics = @event_loop.metrics
+  loop_size = metrics.loop_size
+  events_processed = metrics.events_processed
+  listeners = metrics.listeners
+
+  assert_equal(25, listener)
+  assert_equal(1000, loop_size + events_processed)
 end
