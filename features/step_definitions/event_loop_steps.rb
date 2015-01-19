@@ -2,8 +2,7 @@ Given /^no access to an event loop$/ do
 end
 
 Given /^an event loop$/ do
-  @event_loop = Rubevent::EventLoop.new
-  @event_loop.stop
+  @event_loop = Rubevent::EventLoop.new.start
 end
 
 Given /^a "(.*?)" event$/ do |event_type|
@@ -51,7 +50,6 @@ When /^I publish those events$/ do
 end
 
 When /^I run the event loop$/ do
-  @event_loop.start
   @event_loop.run
 end
 
@@ -60,11 +58,11 @@ Then /^I should have a handle to the event loop$/ do
 end
 
 Then /^event loop should process a "(.*?)" event$/ do |event_type|
-  assert_not_nil @event_loop.events.assoc event_type
+  assert @event_loop.metrics.events_processed(event_type) > 0
 end
 
 Then /^the event loop registers a listener for a "(.*?)" event$/ do |event_type|
-  assert @event_loop.listeners.include? event_type
+  assert @event_loop.metrics.num_listeners(event_type) > 0
 end
 
 Then /^the event listener is notified of the "(.*?)" event$/ do |event_type|
@@ -76,8 +74,8 @@ Then /^I can access metrics for my event loop usage$/ do
   metrics = @event_loop.metrics
   loop_size = metrics.loop_size
   events_processed = metrics.events_processed
-  listeners = metrics.listeners
+  listeners = metrics.num_listeners
 
-  assert_equal(25, listener)
+  assert_equal(25, listeners)
   assert_equal(1000, loop_size + events_processed)
 end

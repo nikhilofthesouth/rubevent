@@ -5,8 +5,9 @@ Feature: publish to event loop
   So that any interested parties can be notified
 
   Scenario: publish 'food' event
-    
+
     Given an event loop
     And a "food" event
     When I publish the event
+    And I run the event loop
     Then event loop should process a "food" event

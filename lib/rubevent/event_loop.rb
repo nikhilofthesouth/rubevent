@@ -1,9 +1,11 @@
+require 'rubevent/metrics'
+
 module Rubevent
 
   class EventLoopError < StandardError; end
 
   class EventLoop
-    attr_reader :events, :listeners, :loop
+    attr_reader :metrics
 
     def initialize
       @active = false
@@ -18,16 +20,19 @@ module Rubevent
           end
         end
       end
+      @metrics = Metrics.new
     end
 
     def publish(event, details = {})
       @events.push [event, details] # array simulates pair
+      @metrics.received event
       start unless @halted
     end
 
     def listen event_type
       listener = Proc.new # wrap the passed block in a proc
       listeners_for(event_type).push listener
+      @metrics.registered event_type
     end
 
     def start
@@ -43,6 +48,7 @@ module Rubevent
     def run
       return if @events.empty?
       event_type, details = @events.shift
+      @metrics.mark_processed event_type
       listeners_for(event_type).each { |listener| listener.call details }
     end
 
