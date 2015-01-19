@@ -1,8 +1,9 @@
 module Rubevent
   describe Metrics do
-    context "newly created metrics" do
-      subject(:metrics) { EventLoop.new.start.metrics }
+    let(:event_loop) { EventLoop.new.start }
+    subject(:metrics) { event_loop.metrics }
 
+    context "newly created metrics" do
       it "should have no events processed" do
         expect(metrics.events_processed).to be 0
       end
@@ -17,9 +18,6 @@ module Rubevent
     end
 
     context "warmed up metrics" do
-      let(:event_loop) { EventLoop.new.start }
-      subject(:metrics) { event_loop.metrics }
-
       before(:example) {
         event_loop.listen("event1") { }
         event_loop.listen("event2") { }

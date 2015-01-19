@@ -1,8 +1,8 @@
 module Rubevent
   describe EventLoop do
-    context "a newly created event loop" do
-      let(:event_loop) { EventLoop.new }
+    subject(:event_loop) { EventLoop.new }
 
+    context "a newly created event loop" do
       it "has no events to process" do
         expect(event_loop.metrics.loop_size).to be 0
       end
@@ -13,11 +13,7 @@ module Rubevent
     end
 
     context "a halted event loop" do
-      let(:event_loop) {
-        event_loop = EventLoop.new
-        event_loop.stop
-        event_loop
-      }
+      before(:example) { event_loop.stop }
 
       it "should not automatically process events" do
         event_loop.publish "event"
@@ -27,7 +23,7 @@ module Rubevent
     end
 
     context "an active event loop" do
-      let(:event_loop) { EventLoop.new.start }
+      before(:example) { event_loop.start }
 
       it "should accept publish events" do
         event_loop.publish "event"
