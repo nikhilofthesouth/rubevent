@@ -25,6 +25,12 @@ module Rubevent
         }.to raise_error(EventListenError)
         expect(event_loop.listeners).to be_empty
       end
+
+      it "should not process events when run" do
+        expect {
+          event_loop.run
+        }.to raise_error(EventLoopError)
+      end
     end
 
     context "an active event loop" do
@@ -32,12 +38,18 @@ module Rubevent
 
       it "should accept publish events" do
         event_loop.publish "event"
-        expect(event_loop.events).to include("event")
+        expect(event_loop.events.assoc "event").to_not be_nil
       end
 
       it "should accept event listeners" do
-        event_loop.listen "event"
+        event_loop.listen("event") { }
         expect(event_loop.listeners).to include("event")
+      end
+
+      it "should process events when run" do
+        event_loop.publish "event"
+        event_loop.run
+        expect(event_loop.events).to be_empty
       end
     end
   end

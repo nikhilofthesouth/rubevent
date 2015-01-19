@@ -1,6 +1,9 @@
 module Rubevent
-  class EventPublishError < StandardError; end
-  class EventListenError < StandardError; end
+
+  class EventLoopError < StandardError; end
+  class EventPublishError < EventLoopError; end
+  class EventListenError < EventLoopError; end
+
   class EventLoop
     attr_reader :active, :events, :listeners
     alias_method :active?, :active
@@ -11,15 +14,15 @@ module Rubevent
       @listeners = {}
     end
 
-    def publish event
+    def publish(event, details = {})
       raise EventPublishError unless @active
-      @events.push event
+      @events.push [event, details]
     end
 
     def listen event_type
       raise EventListenError unless @active
-      listener = Proc.new { yield }
-      @listeners[event_type] = [listener]
+      listener = Proc.new
+      listeners_for(event_type).push listener
     end
 
     def start
@@ -32,8 +35,16 @@ module Rubevent
     end
 
     def run
-      event = @events.shift
-      @listeners[event].each { |listener| listener.call }
+      raise EventLoopError unless @active
+      return if @events.empty?
+      event_type, details = @events.shift
+      listeners_for(event_type).each { |listener| listener.call details }
+    end
+
+    private
+    def listeners_for event_type
+      @listeners[event_type] = [] unless @listeners[event_type].is_a? Array
+      @listeners[event_type]
     end
   end
 end
