@@ -5,11 +5,23 @@ require 'pathname'
 basepath = Pathname(__FILE__).realpath.dirname.dirname.to_path
 rubevent_path = basepath + "/lib"
 
+require 'slop'
+opts = Slop.parse do |o|
+  o.integer '-q', '--max-queue-size', 'maximum event queue size'
+  o.integer '-l', '--max-listeners', 'maximum number of event listeners'
+  o.on '-h', '--help', 'help' do; end
+end
+
+if opts[:help]
+  puts opts
+  exit
+end
+
 # Add rubevent to LOAD_PATH and require it
 $LOAD_PATH << rubevent_path
 require 'rubevent'
 
-event_loop = Rubevent::EventLoop.new.start
+event_loop = Rubevent::EventLoop.new(opts.to_hash).start
 event_loop.listen("event1") { |details|
   puts details
 }

@@ -5,13 +5,17 @@ module Rubevent
   class EventLoopError < StandardError; end
 
   class EventLoop
-    attr_accessor :max_listeners, :max_queue_size
+    attr_accessor :config
     attr_reader :metrics
 
-    def initialize
+    def initialize(opts = {})
       @active = false
       @events = []
       @listeners = {}
+      @metrics = Metrics.new
+
+      configure opts
+
       @loop = Thread.new do
         loop do
           if @events.empty? || @halted
@@ -21,7 +25,6 @@ module Rubevent
           end
         end
       end
-      @metrics = Metrics.new
     end
 
     def publish(event, details = {})
@@ -63,15 +66,22 @@ module Rubevent
     end
 
     def check_max_queue_size
-      if @max_queue_size
-        raise EventLoopError if @events.size >= @max_queue_size
-      end
+      max_queue_size = @config[:max_queue_size]
+      error = max_queue_size && @events.size >= max_queue_size
+      raise EventLoopError if error
     end
 
     def check_max_listeners
-      if @max_listeners
-        raise EventLoopError if @listeners.values.flatten.size >= @max_listeners
-      end
+      max_listeners = @config[:max_listeners]
+      error = max_listeners && @listeners.values.flatten.size >= max_listeners
+      raise EventLoopError if error
+    end
+
+    def configure opts
+      @config = {
+        :max_queue_size => opts["max-queue-size".intern],
+        :max_listeners => opts["max-listeners".intern]
+      }
     end
   end
 end

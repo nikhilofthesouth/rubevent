@@ -42,14 +42,14 @@ module Rubevent
       end
 
       it "should error if max queue size is reached" do
-        event_loop.max_queue_size = 0
+        event_loop.config[:max_queue_size] = 0
         expect {
           event_loop.publish "event"
         }.to raise_error(EventLoopError)
       end
 
       it "should error if max listeners is reached" do
-        event_loop.max_listeners = 0
+        event_loop.config[:max_listeners] = 0
         expect {
           event_loop.listen("event") { }
         }.to raise_error(EventLoopError)
