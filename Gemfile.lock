@@ -1,3 +1,9 @@
+PATH
+  remote: .
+  specs:
+    rubevent (0.1.1)
+      slop (~> 4.0)
+
 GEM
   remote: https://rubygems.org/
   specs:
@@ -36,5 +42,5 @@ PLATFORMS
 DEPENDENCIES
   cucumber
   rspec
-  slop
+  rubevent!
   test-unit
